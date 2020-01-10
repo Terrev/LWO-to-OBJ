@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LWO-to-OBJ", "LWO-to-OBJ\LWO-to-OBJ.csproj", "{8EA437F8-C1E9-4DEA-B445-9DFCED19E0B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LWO to OBJ", "LWO-to-OBJ\LWO to OBJ.csproj", "{8EA437F8-C1E9-4DEA-B445-9DFCED19E0B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
