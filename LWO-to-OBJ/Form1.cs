@@ -542,15 +542,18 @@ namespace LRR_Models
 			for (int i = 0; i < model.surfaces.Count; i++)
 			{
 				mtlString.Append("newmtl ").Append(model.surfaces[i].objFriendlyName).Append("\n");
+				// Original name
 				if (model.surfaces[i].name != model.surfaces[i].objFriendlyName)
 				{
 					mtlString.Append("# Original name: ").Append(model.surfaces[i].name).Append("\n");
 				}
+				// Color
 				if (String.IsNullOrEmpty(model.surfaces[i].colorTexture))
 				{
 					Color color = model.surfaces[i].color;
 					mtlString.Append("Kd ").Append((float)color.R / 255).Append(" ").Append((float)color.G / 255).Append(" ").Append((float)color.B / 255).Append("\n");
 				}
+				// Texture
 				else
 				{
 					mtlString.Append("# Original texture path: ").Append(model.surfaces[i].colorTexture).Append("\n");
@@ -561,7 +564,11 @@ namespace LRR_Models
 					}
 					mtlString.Append("map_Kd ").Append(textureFileName).Append("\n");
 				}
-				mtlString.Append("\n");
+				// Gaps between surfaces
+				if (i < model.surfaces.Count - 1)
+				{
+					mtlString.Append("\n");
+				}
 			}
 			File.WriteAllText(exportPath + "\\" + model.objFriendlyName + ".mtl", mtlString.ToString());
 			Debug.WriteLine("Saved file " + model.objFriendlyName + ".mtl");
