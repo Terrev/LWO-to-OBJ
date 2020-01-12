@@ -55,7 +55,13 @@ namespace LRR_Models
 			public string objFriendlyName = "SURFACENAME";
 			public Color color = Color.White;
 			public SurfaceFlags surfaceFlags = SurfaceFlags.None;
-            public string colorTexture = "";
+			public int luminosity = 0;
+			public int diffuse = 0;
+			public int specularity = 0;
+			public int glossiness = 0;
+			public int reflection = 0;
+			public int transparency = 0;
+			public string colorTextureImage = "";
             public TextureFlags colorTextureFlags = TextureFlags.None;
             public Vector3 colorTextureSize;
             public Vector3 colorTextureCenter;
@@ -215,7 +221,7 @@ namespace LRR_Models
 					model.polygons.Add(polygon);
 					if (polygon.surface < 1)
 					{
-						Debug.WriteLine("DETAIL POLYGONS FOUND");
+						Debug.WriteLine("  DETAIL POLYGONS FOUND");
 					}
 				}
 			}
@@ -240,7 +246,7 @@ namespace LRR_Models
 				}
 
 				string surfaceName = new string(chars.ToArray());
-				Debug.WriteLine("SURF name: " + surfaceName);
+				Debug.WriteLine("  SURF name: " + surfaceName);
 
 				// Padding
 				if (surfaceName.Length % 2 == 0)
@@ -258,7 +264,7 @@ namespace LRR_Models
 				}
 				if (currentSurface == null)
 				{
-					Debug.WriteLine("Couldn't find surface named " + surfaceName);
+					Debug.WriteLine("  Couldn't find surface named " + surfaceName);
 				}
 
 				// now check the sub-chunks
@@ -292,7 +298,7 @@ namespace LRR_Models
 				byte shouldBeZero = binaryReader.ReadByte();
 				if (shouldBeZero != 0)
 				{
-					Debug.WriteLine("	COLR for " + surface.name + " has a weird fourth value: " + shouldBeZero);
+					Debug.WriteLine("	  COLR for " + surface.name + " has a weird fourth value: " + shouldBeZero);
 				}
 			}
 
@@ -301,7 +307,44 @@ namespace LRR_Models
 				// SURFACE FLAGS
 				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
 				surface.surfaceFlags = (SurfaceFlags)binaryReader.ReadUInt16();
-				Debug.WriteLine("	Surface Flags: " + surface.surfaceFlags);
+				Debug.WriteLine("	  Surface Flags: " + surface.surfaceFlags);
+			}
+
+			else if (chunkType == "LUMI")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				surface.luminosity = binaryReader.ReadUInt16();
+				Debug.WriteLine("	  Luminosity: " + surface.luminosity);
+			}
+			else if (chunkType == "DIFF")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				surface.diffuse = binaryReader.ReadUInt16();
+				Debug.WriteLine("	  Diffuse: " + surface.diffuse);
+			}
+			else if (chunkType == "SPEC")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				surface.specularity = binaryReader.ReadUInt16();
+				Debug.WriteLine("	  Specularity: " + surface.specularity);
+			}
+			else if (chunkType == "GLOS")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				surface.glossiness = binaryReader.ReadUInt16();
+				Debug.WriteLine("	  Glossiness: " + surface.glossiness);
+			}
+			else if (chunkType == "REFL")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				surface.reflection = binaryReader.ReadUInt16();
+				Debug.WriteLine("	  Reflection: " + surface.reflection);
+			}
+			else if (chunkType == "TRAN")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				surface.transparency = binaryReader.ReadUInt16();
+				Debug.WriteLine("	  Transparency: " + surface.transparency);
 			}
 
 			else if (chunkType == "CTEX" || chunkType == "LTEX" || chunkType == "DTEX" || chunkType == "STEX" || chunkType == "RTEX" || chunkType == "TTEX" || chunkType == "BTEX")
@@ -343,11 +386,11 @@ namespace LRR_Models
 					binaryReader.ReadByte();
 				}
 
-				Debug.WriteLine("	TIMG path: " + texturePath);
+				Debug.WriteLine("	  TIMG path: " + texturePath);
 
 				if (texturePath != "(none)")
 				{
-					surface.colorTexture = texturePath;
+					surface.colorTextureImage = texturePath;
 				}
 			}
 
@@ -361,7 +404,7 @@ namespace LRR_Models
 					return;
 				}
 				surface.colorTextureFlags = (TextureFlags)binaryReader.ReadUInt16();
-				Debug.WriteLine("	Texture Flags: " + surface.colorTextureFlags);
+				Debug.WriteLine("	  Texture Flags: " + surface.colorTextureFlags);
 			}
 			else if (chunkType == "TSIZ")
 			{
@@ -373,7 +416,7 @@ namespace LRR_Models
 					return;
 				}
 				surface.colorTextureSize = new Vector3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
-				Debug.WriteLine("	Texture Size: " + surface.colorTextureSize);
+				Debug.WriteLine("	  Texture Size: " + surface.colorTextureSize);
 			}
 			else if (chunkType == "TCTR")
 			{
@@ -385,12 +428,12 @@ namespace LRR_Models
 					return;
 				}
 				surface.colorTextureCenter = new Vector3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
-				Debug.WriteLine("	Texture Center: " + surface.colorTextureCenter);
+				Debug.WriteLine("	  Texture Center: " + surface.colorTextureCenter);
 			}
 
 			else
 			{
-				//Debug.WriteLine("Unknown SURF sub-chunk type: " + chunkType + ", length " + chunkLength);
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength + ", UNHANDLED SURF SUB-CHUNK TYPE");
 				fileStream.Seek(chunkLength, SeekOrigin.Current);
 			}
 		}
@@ -459,7 +502,7 @@ namespace LRR_Models
 			// Surface texture paths
 			for (int i = 0; i < surfaceCount; i++)
 			{
-				model.surfaces[i].colorTexture = streamReader.ReadLine();
+				model.surfaces[i].colorTextureImage = streamReader.ReadLine();
 			}
 
 			int polyCount = int.Parse(streamReader.ReadLine());
@@ -575,7 +618,7 @@ namespace LRR_Models
 					mtlString.Append("# Original name: ").Append(model.surfaces[i].name).Append("\n");
 				}
 				// Color
-				if (String.IsNullOrEmpty(model.surfaces[i].colorTexture))
+				if (String.IsNullOrEmpty(model.surfaces[i].colorTextureImage))
 				{
 					Color color = model.surfaces[i].color;
 					mtlString.Append("Kd ").Append((float)color.R / 255).Append(" ").Append((float)color.G / 255).Append(" ").Append((float)color.B / 255).Append("\n");
@@ -583,8 +626,8 @@ namespace LRR_Models
 				// Texture
 				else
 				{
-					mtlString.Append("# Original texture path: ").Append(model.surfaces[i].colorTexture).Append("\n");
-					string textureFileName = Path.GetFileName(model.surfaces[i].colorTexture);
+					mtlString.Append("# Original texture path: ").Append(model.surfaces[i].colorTextureImage).Append("\n");
+					string textureFileName = Path.GetFileName(model.surfaces[i].colorTextureImage);
 					if (textureFileName.EndsWith(" (sequence)"))
 					{
 						textureFileName = textureFileName.Substring(0, textureFileName.Length - 11);
