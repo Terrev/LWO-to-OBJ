@@ -20,7 +20,23 @@ namespace LRR_Models
             public Int16 surface;
         }
 
-        [Flags]
+		[Flags]
+		public enum SurfaceFlags
+		{
+			None = 0,
+			Luminous = 1,
+			Outline = 2,
+			Smoothing = 4,
+			ColorHighlights = 8,
+			ColorFilter = 16,
+			OpaqueEdge = 32,
+			TransparentEdge = 64,
+			SharpTerminator = 128,
+			DoubleSided = 256,
+			Additive = 512,
+		}
+
+		[Flags]
         public enum TextureFlags
         {
             None = 0,
@@ -38,10 +54,11 @@ namespace LRR_Models
             public string name = "SURFACENAME";
 			public string objFriendlyName = "SURFACENAME";
 			public Color color = Color.White;
+			public SurfaceFlags surfaceFlags = SurfaceFlags.None;
             public string colorTexture = "";
-            public TextureFlags textureFlags = TextureFlags.None;
-            public Vector3 textureSize;
-            public Vector3 textureCenter;
+            public TextureFlags colorTextureFlags = TextureFlags.None;
+            public Vector3 colorTextureSize;
+            public Vector3 colorTextureCenter;
         }
 
         public class Model
@@ -95,6 +112,8 @@ namespace LRR_Models
 
 			FileStream fileStream = new FileStream(inputPath, FileMode.Open);
 			BinaryReader2 binaryReader = new BinaryReader2(fileStream);
+
+			Debug.WriteLine("\n\n==================================================================================================\nREADING FILE " + inputPath);
 
 			// FORM
 			fileStream.Seek(4, SeekOrigin.Current);
@@ -196,7 +215,7 @@ namespace LRR_Models
 					model.polygons.Add(polygon);
 					if (polygon.surface < 1)
 					{
-						Debug.WriteLine("Detail polygons found");
+						Debug.WriteLine("DETAIL POLYGONS FOUND");
 					}
 				}
 			}
@@ -221,7 +240,7 @@ namespace LRR_Models
 				}
 
 				string surfaceName = new string(chars.ToArray());
-				Debug.WriteLine(surfaceName);
+				Debug.WriteLine("SURF name: " + surfaceName);
 
 				// Padding
 				if (surfaceName.Length % 2 == 0)
@@ -273,8 +292,16 @@ namespace LRR_Models
 				byte shouldBeZero = binaryReader.ReadByte();
 				if (shouldBeZero != 0)
 				{
-					Debug.WriteLine("COLR for " + surface.name + " has a weird fourth value: " + shouldBeZero);
+					Debug.WriteLine("	COLR for " + surface.name + " has a weird fourth value: " + shouldBeZero);
 				}
+			}
+
+			else if (chunkType == "FLAG")
+			{
+				// SURFACE FLAGS
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				surface.surfaceFlags = (SurfaceFlags)binaryReader.ReadUInt16();
+				Debug.WriteLine("	Surface Flags: " + surface.surfaceFlags);
 			}
 
 			else if (chunkType == "CTEX" || chunkType == "LTEX" || chunkType == "DTEX" || chunkType == "STEX" || chunkType == "RTEX" || chunkType == "TTEX" || chunkType == "BTEX")
@@ -316,7 +343,7 @@ namespace LRR_Models
 					binaryReader.ReadByte();
 				}
 
-				Debug.WriteLine(texturePath);
+				Debug.WriteLine("	TIMG path: " + texturePath);
 
 				if (texturePath != "(none)")
 				{
@@ -333,8 +360,8 @@ namespace LRR_Models
 					fileStream.Seek(chunkLength, SeekOrigin.Current);
 					return;
 				}
-				surface.textureFlags = (TextureFlags)binaryReader.ReadUInt16();
-				Debug.WriteLine(surface.textureFlags);
+				surface.colorTextureFlags = (TextureFlags)binaryReader.ReadUInt16();
+				Debug.WriteLine("	Texture Flags: " + surface.colorTextureFlags);
 			}
 			else if (chunkType == "TSIZ")
 			{
@@ -345,8 +372,8 @@ namespace LRR_Models
 					fileStream.Seek(chunkLength, SeekOrigin.Current);
 					return;
 				}
-				surface.textureSize = new Vector3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
-				Debug.WriteLine(surface.textureSize);
+				surface.colorTextureSize = new Vector3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
+				Debug.WriteLine("	Texture Size: " + surface.colorTextureSize);
 			}
 			else if (chunkType == "TCTR")
 			{
@@ -357,8 +384,8 @@ namespace LRR_Models
 					fileStream.Seek(chunkLength, SeekOrigin.Current);
 					return;
 				}
-				surface.textureCenter = new Vector3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
-				Debug.WriteLine(surface.textureCenter);
+				surface.colorTextureCenter = new Vector3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
+				Debug.WriteLine("	Texture Center: " + surface.colorTextureCenter);
 			}
 
 			else
@@ -381,20 +408,20 @@ namespace LRR_Models
 
 					Vector3 someVector = model.vertices[polygon.indices[i]];
 					someVector = new Vector3(someVector.X, someVector.Y, -someVector.Z);
-					someVector -= surface.textureCenter;
-					someVector = new Vector3(someVector.X / surface.textureSize.X, someVector.Y / surface.textureSize.Y, someVector.Z / surface.textureSize.Z);
+					someVector -= surface.colorTextureCenter;
+					someVector = new Vector3(someVector.X / surface.colorTextureSize.X, someVector.Y / surface.colorTextureSize.Y, someVector.Z / surface.colorTextureSize.Z);
 
-					if ((surface.textureFlags & TextureFlags.X) == TextureFlags.X)
+					if ((surface.colorTextureFlags & TextureFlags.X) == TextureFlags.X)
 					{
 						u = 0.5f + someVector.Z;
 						v = 0.5f + someVector.Y;
 					}
-					else if ((surface.textureFlags & TextureFlags.Y) == TextureFlags.Y)
+					else if ((surface.colorTextureFlags & TextureFlags.Y) == TextureFlags.Y)
 					{
 						u = 0.5f + someVector.X;
 						v = 0.5f + someVector.Z;
 					}
-					else if ((surface.textureFlags & TextureFlags.Z) == TextureFlags.Z)
+					else if ((surface.colorTextureFlags & TextureFlags.Z) == TextureFlags.Z)
 					{
 						u = 0.5f + someVector.X;
 						v = 0.5f + someVector.Y;
@@ -572,6 +599,8 @@ namespace LRR_Models
 			}
 			File.WriteAllText(exportPath + "\\" + model.objFriendlyName + ".mtl", mtlString.ToString());
 			Debug.WriteLine("Saved file " + model.objFriendlyName + ".mtl");
+
+			Debug.WriteLine("==================================================================================================\n\n");
 		}
 	}
 }
