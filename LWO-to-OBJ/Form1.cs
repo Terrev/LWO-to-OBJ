@@ -34,6 +34,13 @@ namespace LRR_Models
 			SharpTerminator = 128,
 			DoubleSided = 256,
 			Additive = 512,
+
+			Unknown1024 = 1024,
+			Unknown2048 = 2048,
+			Unknown4096 = 4096,
+			Unknown8192 = 8192,
+			Unknown16384 = 16384,
+			Unknown32768 = 32768,
 		}
 
 		[Flags]
@@ -47,7 +54,17 @@ namespace LRR_Models
             NegativeImage = 16,
             PixelBlending = 32,
             Antialiasing = 64,
-        }
+
+			Unknown128 = 128,
+			Unknown256 = 256,
+			Unknown512 = 512,
+			Unknown1024 = 1024,
+			Unknown2048 = 2048,
+			Unknown4096 = 4096,
+			Unknown8192 = 8192,
+			Unknown16384 = 16384,
+			Unknown32768 = 32768,
+		}
 
         public class Surface
         {
@@ -611,12 +628,23 @@ namespace LRR_Models
 			StringBuilder mtlString = new StringBuilder();
 			for (int i = 0; i < model.surfaces.Count; i++)
 			{
+				mtlString.Append("# Surface name:  ").Append(model.surfaces[i].name).Append("\n");
+				mtlString.Append("# Surface flags: ").Append(model.surfaces[i].surfaceFlags).Append("\n");
+
+				mtlString.Append("# Color (RGB):   ").Append(model.surfaces[i].color.R + " " + model.surfaces[i].color.G + " " + model.surfaces[i].color.B).Append("\n");
+
+				// lol
+				mtlString.Append("# Luminosity:    ").Append(model.surfaces[i].luminosity).Append(" (").Append(((float)model.surfaces[i].luminosity / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Diffuse:       ").Append(model.surfaces[i].diffuse).Append(" (").Append(((float)model.surfaces[i].diffuse / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Specularity:   ").Append(model.surfaces[i].specularity).Append(" (").Append(((float)model.surfaces[i].specularity / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Glossiness     ").Append(model.surfaces[i].glossiness).Append(" (").Append(((float)model.surfaces[i].glossiness / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Reflection:    ").Append(model.surfaces[i].reflection).Append(" (").Append(((float)model.surfaces[i].reflection / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Transparency:  ").Append(model.surfaces[i].transparency).Append(" (").Append(((float)model.surfaces[i].transparency / 256) * 100.0f).Append("%)").Append("\n");
+
+				mtlString.Append("# Texture flags: ").Append(model.surfaces[i].colorTextureFlags).Append("\n");
+				mtlString.Append("# Texture path:  ").Append(model.surfaces[i].colorTextureImage).Append("\n");
+
 				mtlString.Append("newmtl ").Append(model.surfaces[i].objFriendlyName).Append("\n");
-				// Original name
-				if (model.surfaces[i].name != model.surfaces[i].objFriendlyName)
-				{
-					mtlString.Append("# Original name: ").Append(model.surfaces[i].name).Append("\n");
-				}
 				// Color
 				if (String.IsNullOrEmpty(model.surfaces[i].colorTextureImage))
 				{
@@ -626,7 +654,6 @@ namespace LRR_Models
 				// Texture
 				else
 				{
-					mtlString.Append("# Original texture path: ").Append(model.surfaces[i].colorTextureImage).Append("\n");
 					string textureFileName = Path.GetFileName(model.surfaces[i].colorTextureImage);
 					if (textureFileName.EndsWith(" (sequence)"))
 					{
@@ -634,7 +661,7 @@ namespace LRR_Models
 					}
 					mtlString.Append("map_Kd ").Append(textureFileName).Append("\n");
 				}
-				// Gaps between surfaces
+				// Empty lines between surfaces
 				if (i < model.surfaces.Count - 1)
 				{
 					mtlString.Append("\n");
