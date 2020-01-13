@@ -119,6 +119,9 @@ namespace LRR_Models
 				{
 					LwoToObj(fileName);
 				}
+
+				Form2 form2 = new Form2();
+				form2.ShowDialog();
 			}
 		}
 
