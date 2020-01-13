@@ -18,5 +18,7 @@ namespace LRR_Models
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }
+
+        public static bool flipOnX = false;
     }
 }
