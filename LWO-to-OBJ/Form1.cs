@@ -88,6 +88,7 @@ namespace LRR_Models
 		{
 			public string directory = "MODELDIRECTORY";
 			public string name = "MODELNAME";
+			public string nameWithExtension = "MODELNAMEWITHEXTENTION";
 			public string objFriendlyName = "MODELNAME";
 			public bool hasExternalUVs = false;
 			public Vector3[] vertices;
@@ -130,6 +131,7 @@ namespace LRR_Models
 			model = new Model();
 			model.directory = Path.GetDirectoryName(inputPath);
 			model.name = Path.GetFileNameWithoutExtension(inputPath);
+			model.nameWithExtension = Path.GetFileName(inputPath);
 			model.objFriendlyName = RemoveSpecialCharacters(model.name);
 			currentTextureType = "";
 
@@ -567,14 +569,15 @@ namespace LRR_Models
 
 		public void Export(Model model, string exportPath)
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append("mtllib ").Append(model.objFriendlyName).Append(".mtl\n");
-			sb.Append("\ng ").Append(model.objFriendlyName).Append("\n");
+			StringBuilder objString = new StringBuilder();
+			objString.Append("# ").Append(model.nameWithExtension).Append("\n\n");
+			objString.Append("mtllib ").Append(model.objFriendlyName).Append(".mtl\n");
+			objString.Append("\ng ").Append(model.objFriendlyName).Append("\n");
 
 			// VERTICES
 			foreach (Vector3 vertex in model.vertices)
 			{
-				sb.Append(string.Format("v {0} {1} {2}\n", vertex.X, vertex.Y, vertex.Z));
+				objString.Append(string.Format("v {0} {1} {2}\n", vertex.X, vertex.Y, vertex.Z));
 			}
 
 			// UV
@@ -599,33 +602,34 @@ namespace LRR_Models
 			// write list
 			foreach (Vector2 uv in existingUVCoords)
 			{
-				sb.Append(string.Format("vt {0} {1}\n", uv.X, uv.Y));
+				objString.Append(string.Format("vt {0} {1}\n", uv.X, uv.Y));
 			}
 
 			// POLYGONS
 			int currentSurface = model.polygons[0].surface;
-			sb.Append("usemtl ").Append(model.surfaces[currentSurface - 1].objFriendlyName).Append("\n");
+			objString.Append("usemtl ").Append(model.surfaces[currentSurface - 1].objFriendlyName).Append("\n");
 			foreach (Polygon polygon in model.polygons)
 			{
 				if (polygon.surface != currentSurface)
 				{
 					currentSurface = polygon.surface;
-					sb.Append("usemtl ").Append(model.surfaces[currentSurface - 1].objFriendlyName).Append("\n");
+					objString.Append("usemtl ").Append(model.surfaces[currentSurface - 1].objFriendlyName).Append("\n");
 				}
-				sb.Append("f ");
+				objString.Append("f ");
 				for (int i = 0; i < polygon.indices.Length; i++)
 				{
-					sb.Append(polygon.indices[i] + 1).Append("/").Append(polygon.uvIndices[i] + 1).Append(" ");
+					objString.Append(polygon.indices[i] + 1).Append("/").Append(polygon.uvIndices[i] + 1).Append(" ");
 				}
-				sb.Append("\n");
+				objString.Append("\n");
 			}
 
 			Directory.CreateDirectory(exportPath);
-			File.WriteAllText(exportPath + "\\" + model.objFriendlyName + ".obj", sb.ToString());
+			File.WriteAllText(exportPath + "\\" + model.objFriendlyName + ".obj", objString.ToString());
 			Debug.WriteLine("Saved file " + model.objFriendlyName + ".obj");
 
 			// MTL
 			StringBuilder mtlString = new StringBuilder();
+			mtlString.Append("# ").Append(model.nameWithExtension).Append("\n\n");
 			for (int i = 0; i < model.surfaces.Count; i++)
 			{
 				mtlString.Append("# Surface name:  ").Append(model.surfaces[i].name).Append("\n");
