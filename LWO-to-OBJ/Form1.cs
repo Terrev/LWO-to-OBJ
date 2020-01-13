@@ -9,16 +9,16 @@ using System.Diagnostics;
 
 namespace LRR_Models
 {
-    public partial class Form1 : Form
-    {
-        // SURE LET'S SHOVE THIS ALL IN HERE
-        public struct Polygon
-        {
-            public UInt16[] indices;
-            public Vector2[] uv;
-            public int[] uvIndices;
-            public Int16 surface;
-        }
+	public partial class Form1 : Form
+	{
+		// SURE LET'S SHOVE THIS ALL IN HERE
+		public struct Polygon
+		{
+			public UInt16[] indices;
+			public Vector2[] uv;
+			public int[] uvIndices;
+			public Int16 surface;
+		}
 
 		[Flags]
 		public enum SurfaceFlags
@@ -44,16 +44,16 @@ namespace LRR_Models
 		}
 
 		[Flags]
-        public enum TextureFlags
-        {
-            None = 0,
-            X = 1,
-            Y = 2,
-            Z = 4,
-            WorldCoords = 8,
-            NegativeImage = 16,
-            PixelBlending = 32,
-            Antialiasing = 64,
+		public enum TextureFlags
+		{
+			None = 0,
+			X = 1,
+			Y = 2,
+			Z = 4,
+			WorldCoords = 8,
+			NegativeImage = 16,
+			PixelBlending = 32,
+			Antialiasing = 64,
 
 			Unknown128 = 128,
 			Unknown256 = 256,
@@ -66,9 +66,9 @@ namespace LRR_Models
 			Unknown32768 = 32768,
 		}
 
-        public class Surface
-        {
-            public string name = "SURFACENAME";
+		public class Surface
+		{
+			public string name = "SURFACENAME";
 			public string objFriendlyName = "SURFACENAME";
 			public Color color = Color.White;
 			public SurfaceFlags surfaceFlags = SurfaceFlags.None;
@@ -79,29 +79,29 @@ namespace LRR_Models
 			public int reflection = 0;
 			public int transparency = 0;
 			public string colorTextureImage = "";
-            public TextureFlags colorTextureFlags = TextureFlags.None;
-            public Vector3 colorTextureSize;
-            public Vector3 colorTextureCenter;
-        }
+			public TextureFlags colorTextureFlags = TextureFlags.None;
+			public Vector3 colorTextureSize;
+			public Vector3 colorTextureCenter;
+		}
 
-        public class Model
-        {
+		public class Model
+		{
 			public string directory = "MODELDIRECTORY";
 			public string name = "MODELNAME";
 			public string objFriendlyName = "MODELNAME";
 			public bool hasExternalUVs = false;
 			public Vector3[] vertices;
-            public List<Polygon> polygons = new List<Polygon>();
-            public List<Surface> surfaces = new List<Surface>();
-        }
+			public List<Polygon> polygons = new List<Polygon>();
+			public List<Surface> surfaces = new List<Surface>();
+		}
 
-        // UI STUFF
-        public Form1()
-        {
-            InitializeComponent();
-        }
+		// UI STUFF
+		public Form1()
+		{
+			InitializeComponent();
+		}
 
-        OpenFileDialog openFileDialog = new OpenFileDialog();
+		OpenFileDialog openFileDialog = new OpenFileDialog();
 
 		private void checkBox1_CheckedChanged(object sender, EventArgs e)
 		{
@@ -109,17 +109,17 @@ namespace LRR_Models
 		}
 
 		private void button1_Click(object sender, EventArgs e)
-        {
-            openFileDialog.Filter = "LWO files (*.LWO)|*.LWO|All files (*.*)|*.*";
+		{
+			openFileDialog.Filter = "LWO files (*.LWO)|*.LWO|All files (*.*)|*.*";
 			openFileDialog.Multiselect = true;
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
+			{
 				foreach (String fileName in openFileDialog.FileNames)
 				{
 					LwoToObj(fileName);
 				}
-            }
-        }
+			}
+		}
 
 		// ACTUAL DIRTY WORK
 		Model model;
@@ -515,7 +515,7 @@ namespace LRR_Models
 			{
 				streamReader.ReadLine();
 			}
-			 
+
 			// Surface texture paths
 			for (int i = 0; i < surfaceCount; i++)
 			{
