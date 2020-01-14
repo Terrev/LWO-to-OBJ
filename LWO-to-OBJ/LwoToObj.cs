@@ -15,6 +15,8 @@ namespace LRR_Models
 
 		public void ConvertFile(string inputPath, string exportPath)
 		{
+			Debug.WriteLine("\n\n==================================================================================================\nREADING FILE " + inputPath);
+
 			model = new Model();
 			model.directory = Path.GetDirectoryName(inputPath);
 			model.name = Path.GetFileNameWithoutExtension(inputPath);
@@ -24,8 +26,6 @@ namespace LRR_Models
 
 			FileStream fileStream = new FileStream(inputPath, FileMode.Open);
 			BinaryReader2 binaryReader = new BinaryReader2(fileStream);
-
-			Debug.WriteLine("\n\n==================================================================================================\nREADING FILE " + inputPath);
 
 			// FORM
 			fileStream.Seek(4, SeekOrigin.Current);
@@ -98,7 +98,6 @@ namespace LRR_Models
 			else if (chunkType == "SRFS")
 			{
 				Debug.WriteLine(chunkType + ", length " + chunkLength);
-
 				string stuff = new string(binaryReader.ReadChars(chunkLength));
 				string[] splitStrings = stuff.Split(new char[] { '\0' }, StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 0; i < splitStrings.Length; i++)

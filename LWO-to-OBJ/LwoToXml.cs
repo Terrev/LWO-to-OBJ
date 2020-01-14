@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Numerics;
 using System.IO;
 using System.Xml;
 using System.Diagnostics;
@@ -14,7 +10,7 @@ namespace LRR_Models
 	{
 		public void ConvertFile(string inputPath, string exportPath)
 		{
-			exportPath = exportPath + "\\" + Path.GetFileNameWithoutExtension(inputPath) + ".xml";
+			Debug.WriteLine("\n\n==================================================================================================\nREADING FILE " + inputPath);
 
 			FileStream fileStream = new FileStream(inputPath, FileMode.Open);
 			BinaryReader2 binaryReader = new BinaryReader2(fileStream);
@@ -48,6 +44,8 @@ namespace LRR_Models
 			binaryReader.Close();
 			fileStream.Close();
 
+			string exportPathWithFileName = exportPath + "\\" + Path.GetFileNameWithoutExtension(inputPath) + ".xml";
+
 			XmlWriterSettings settings = new XmlWriterSettings
 			{
 				Indent = true,
@@ -55,10 +53,12 @@ namespace LRR_Models
 				NewLineOnAttributes = false
 
 			};
-			using (XmlWriter writer = XmlWriter.Create(exportPath, settings))
+			using (XmlWriter writer = XmlWriter.Create(exportPathWithFileName, settings))
 			{
 				xmlDocument.Save(writer);
 			}
+			Debug.WriteLine("Saved file " + exportPathWithFileName);
+			Debug.WriteLine("==================================================================================================\n\n");
 		}
 
 		void ReadChunk(FileStream fileStream, BinaryReader binaryReader, string chunkType, int chunkLength, XmlDocument xmlDocument)
@@ -68,9 +68,9 @@ namespace LRR_Models
 
 			if (chunkType == "PNTS")
 			{
+				Debug.WriteLine(chunkType + ", length " + chunkLength);
 				if (Program.writeFloatingPointToText)
 				{
-					Debug.WriteLine(chunkType + ", length " + chunkLength);
 					int vertexCount = chunkLength / 12;
 					for (int i = 0; i < vertexCount; i++)
 					{
@@ -81,7 +81,6 @@ namespace LRR_Models
 				}
 				else
 				{
-					Debug.WriteLine(chunkType + ", length " + chunkLength);
 					byte[] byteArray = binaryReader.ReadBytes(chunkLength);
 					string hex = BitConverter.ToString(byteArray).Replace("-", " ");
 					chunk.SetAttribute("HexData", hex);
@@ -91,7 +90,6 @@ namespace LRR_Models
 			else if (chunkType == "SRFS")
 			{
 				Debug.WriteLine(chunkType + ", length " + chunkLength);
-
 				string stuff = new string(binaryReader.ReadChars(chunkLength));
 				string[] splitStrings = stuff.Split(new char[] { '\0' }, StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 0; i < splitStrings.Length; i++)
@@ -131,7 +129,6 @@ namespace LRR_Models
 			{
 				Debug.WriteLine(chunkType + ", length " + chunkLength);
 				long startPoint = fileStream.Position;
-
 				List<char> chars = new List<char>();
 				bool hasFoundEnd = false;
 				while (!hasFoundEnd)
@@ -146,12 +143,9 @@ namespace LRR_Models
 						chars.Add(currentChar);
 					}
 				}
-
 				string surfaceName = new string(chars.ToArray());
 				Debug.WriteLine("  SURF name: " + surfaceName);
-
 				chunk.SetAttribute("SurfaceName", surfaceName);
-
 				// Padding
 				if (surfaceName.Length % 2 == 0)
 				{
