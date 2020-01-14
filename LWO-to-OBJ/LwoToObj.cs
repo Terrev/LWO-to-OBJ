@@ -8,8 +8,8 @@ using System.Diagnostics;
 
 namespace LRR_Models
 {
-    class LwoToObj
-    {
+	class LwoToObj
+	{
 		Model model;
 		string currentTextureType = "";
 

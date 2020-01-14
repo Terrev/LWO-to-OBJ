@@ -10,16 +10,16 @@ using System.Diagnostics;
 
 namespace LRR_Models
 {
-    class LwoToXml
-    {
-        public void ConvertFile(string inputPath, string exportPath)
-        {
+	class LwoToXml
+	{
+		public void ConvertFile(string inputPath, string exportPath)
+		{
 			exportPath = exportPath + "\\" + Path.GetFileNameWithoutExtension(inputPath) + "_test.xml";
 
 			FileStream fileStream = new FileStream(inputPath, FileMode.Open);
-            BinaryReader2 binaryReader = new BinaryReader2(fileStream);
+			BinaryReader2 binaryReader = new BinaryReader2(fileStream);
 
-            XmlDocument xmlDocument = new XmlDocument();
+			XmlDocument xmlDocument = new XmlDocument();
 
 			XmlElement root = xmlDocument.CreateElement("LWO");
 			xmlDocument.AppendChild(root);
@@ -196,7 +196,7 @@ namespace LRR_Models
 				{
 					Debug.WriteLine("	  COLR has a weird fourth value: " + shouldBeZero);
 				}
-				chunk.InnerText =  r + "," + g + "," + b;
+				chunk.InnerText = r + "," + g + "," + b;
 			}
 
 			else if (chunkType == "TIMG")
