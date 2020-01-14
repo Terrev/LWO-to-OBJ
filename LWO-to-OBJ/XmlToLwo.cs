@@ -101,7 +101,7 @@ namespace LRR_Models
 						binaryWriter.Write("te".ToCharArray());
 						long rememberMeAgain = fileStream.Position;
 
-						if (subChunk.Name == "COLR")
+						if (subChunk.Name == "COLR" || subChunk.Name == "TCLR")
 						{
 							string[] splitStrings = subChunk.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 							foreach (string asdfsdhj in splitStrings)
@@ -111,12 +111,17 @@ namespace LRR_Models
 							binaryWriter.Write('\0');
 						}
 
-						else if (subChunk.Name == "TIMG")
+						else if (subChunk.Name == "LUMI" || subChunk.Name == "DIFF" || subChunk.Name == "SPEC" || subChunk.Name == "GLOS" || subChunk.Name == "REFL" || subChunk.Name == "TRAN" || subChunk.Name == "TVAL")
+						{
+							binaryWriter.Write(UInt16.Parse(subChunk.InnerText));
+						}
+
+						else if (subChunk.Name == "CTEX" || subChunk.Name == "LTEX" || subChunk.Name == "DTEX" || subChunk.Name == "STEX" || subChunk.Name == "RTEX" || subChunk.Name == "TTEX" || subChunk.Name == "BTEX" || subChunk.Name == "TIMG" || subChunk.Name == "RIMG")
 						{
 							binaryWriter.Write(subChunk.InnerText.ToCharArray());
 							binaryWriter.Write('\0');
 							// padding
-							if (chunk.Attributes["SurfaceName"].Value.Length % 2 == 0)
+							if (subChunk.InnerText.Length % 2 == 0)
 							{
 								binaryWriter.Write('\0');
 							}

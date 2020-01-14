@@ -14,7 +14,7 @@ namespace LRR_Models
 	{
 		public void ConvertFile(string inputPath, string exportPath)
 		{
-			exportPath = exportPath + "\\" + Path.GetFileNameWithoutExtension(inputPath) + "_test.xml";
+			exportPath = exportPath + "\\" + Path.GetFileNameWithoutExtension(inputPath) + ".xml";
 
 			FileStream fileStream = new FileStream(inputPath, FileMode.Open);
 			BinaryReader2 binaryReader = new BinaryReader2(fileStream);
@@ -185,7 +185,7 @@ namespace LRR_Models
 			XmlElement chunk = xmlDocument.CreateElement(chunkType);
 			parentChunk.AppendChild(chunk);
 
-			if (chunkType == "COLR")
+			if (chunkType == "COLR" || chunkType == "TCLR")
 			{
 				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
 				int r = (int)binaryReader.ReadByte();
@@ -194,12 +194,18 @@ namespace LRR_Models
 				byte shouldBeZero = binaryReader.ReadByte();
 				if (shouldBeZero != 0)
 				{
-					Debug.WriteLine("	  COLR has a weird fourth value: " + shouldBeZero);
+					Debug.WriteLine("	  " + chunkType + " has a weird fourth value: " + shouldBeZero);
 				}
 				chunk.InnerText = r + "," + g + "," + b;
 			}
 
-			else if (chunkType == "TIMG")
+			else if (chunkType == "LUMI" || chunkType == "DIFF" || chunkType == "SPEC" || chunkType == "GLOS" || chunkType == "REFL" || chunkType == "TRAN" || chunkType == "TVAL")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				chunk.InnerText = binaryReader.ReadUInt16().ToString();
+			}
+
+			else if (chunkType == "CTEX" || chunkType == "LTEX" || chunkType == "DTEX" || chunkType == "STEX" || chunkType == "RTEX" || chunkType == "TTEX" || chunkType == "BTEX" || chunkType == "TIMG" || chunkType == "RIMG")
 			{
 				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
 
@@ -228,7 +234,7 @@ namespace LRR_Models
 
 				chunk.InnerText = texturePath;
 
-				Debug.WriteLine("	  TIMG path: " + texturePath);
+				Debug.WriteLine("	  " + chunkType + " path: " + texturePath);
 			}
 
 			else
