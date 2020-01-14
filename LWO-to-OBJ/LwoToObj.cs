@@ -13,7 +13,7 @@ namespace LRR_Models
 		Model model;
 		string currentTextureType = "";
 
-		public void Convert(string inputPath, string exportPath)
+		public void ConvertFile(string inputPath, string exportPath)
 		{
 			model = new Model();
 			model.directory = Path.GetDirectoryName(inputPath);

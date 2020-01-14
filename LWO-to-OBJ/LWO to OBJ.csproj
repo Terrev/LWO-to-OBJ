@@ -66,6 +66,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinaryReader2.cs" />
+    <Compile Include="BinaryWriter2.cs" />
+    <Compile Include="XmlToLwo.cs" />
+    <Compile Include="LwoToXml.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="LwoToObj.cs" />
     <Compile Include="Form1.cs">
