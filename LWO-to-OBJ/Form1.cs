@@ -23,14 +23,8 @@ namespace LRR_Models
 		OpenFileDialog openFileDialog3 = new OpenFileDialog();
 		VistaFolderBrowserDialog folderBrowserDialog3 = new Ookii.Dialogs.VistaFolderBrowserDialog();
 
-		private void checkBox1_CheckedChanged(object sender, EventArgs e)
-		{
-			Program.flipOnX = checkBox1.Checked;
-		}
-
 		private void button1_Click(object sender, EventArgs e)
 		{
-			// shrug, why not
 			Program.flipOnX = checkBox1.Checked;
 
 			LwoToObj lwoToObj = new LwoToObj();
@@ -59,6 +53,8 @@ namespace LRR_Models
 
 		private void button2_Click(object sender, EventArgs e)
 		{
+			Program.writeFloatingPointToText = checkBox2.Checked;
+
 			LwoToXml lwoToXml = new LwoToXml();
 
 			openFileDialog2.Filter = "LWO files (*.LWO)|*.LWO|All files (*.*)|*.*";

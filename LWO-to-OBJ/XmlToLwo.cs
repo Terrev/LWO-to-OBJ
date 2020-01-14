@@ -33,7 +33,27 @@ namespace LRR_Models
                 binaryWriter.Write("temp".ToCharArray());
                 long rememberMe = fileStream.Position;
 
-                if (chunk.Name == "SRFS")
+                // READ THE CHUNKS
+                if (chunk.Name == "PNTS")
+                {
+                    if (chunk.Attributes["HexData"] != null)
+                    {
+                        binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
+                    }
+                    else
+                    {
+                        foreach (XmlNode vertex in chunk.ChildNodes)
+                        {
+                            string[] splitStrings = vertex.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (string asdsfdsf in splitStrings)
+                            {
+                                binaryWriter.Write((float)float.Parse(asdsfdsf));
+                            }
+                        }
+                    }
+                }
+
+                else if (chunk.Name == "SRFS")
                 {
                     foreach (XmlNode surfaceName in chunk.ChildNodes)
                     {
@@ -51,8 +71,7 @@ namespace LRR_Models
                 {
                     foreach (XmlNode polygon in chunk.ChildNodes)
                     {
-                        string indicesString = polygon.Attributes["Indices"].Value;
-                        string[] splitStrings = indicesString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] splitStrings = polygon.Attributes["Indices"].Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                         binaryWriter.Write((UInt16)splitStrings.Length);
                         foreach (string help in splitStrings)
                         {
@@ -72,11 +91,10 @@ namespace LRR_Models
                         binaryWriter.Write('\0');
                     }
 
-                    // sub-chunks
+                    // SURF SUB-CHUNKS
+                    // HOOBOY
                     foreach (XmlNode subChunk in chunk.ChildNodes)
                     {
-                        // haaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-
                         binaryWriter.Write(subChunk.Name.ToCharArray());
 
                         // Temp length
@@ -85,13 +103,23 @@ namespace LRR_Models
 
                         if (subChunk.Name == "COLR")
                         {
-                            string colorString = subChunk.InnerText;
-                            string[] splitStrings = colorString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            string[] splitStrings = subChunk.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                             foreach (string asdfsdhj in splitStrings)
                             {
                                 binaryWriter.Write(byte.Parse(asdfsdhj));
                             }
                             binaryWriter.Write('\0');
+                        }
+
+                        else if (subChunk.Name == "TIMG")
+                        {
+                            binaryWriter.Write(subChunk.InnerText.ToCharArray());
+                            binaryWriter.Write('\0');
+                            // padding
+                            if (chunk.Attributes["SurfaceName"].Value.Length % 2 == 0)
+                            {
+                                binaryWriter.Write('\0');
+                            }
                         }
 
                         else

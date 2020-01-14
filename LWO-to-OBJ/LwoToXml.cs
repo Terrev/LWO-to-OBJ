@@ -14,7 +14,7 @@ namespace LRR_Models
     {
         public void ConvertFile(string inputPath, string exportPath)
         {
-			exportPath = exportPath + "\\" + Path.GetFileNameWithoutExtension(inputPath) + ".xml";
+			exportPath = exportPath + "\\" + Path.GetFileNameWithoutExtension(inputPath) + "_test.xml";
 
 			FileStream fileStream = new FileStream(inputPath, FileMode.Open);
             BinaryReader2 binaryReader = new BinaryReader2(fileStream);
@@ -52,7 +52,7 @@ namespace LRR_Models
 			{
 				Indent = true,
 				IndentChars = "	",
-				NewLineOnAttributes = true
+				NewLineOnAttributes = false
 
 			};
 			using (XmlWriter writer = XmlWriter.Create(exportPath, settings))
@@ -66,7 +66,29 @@ namespace LRR_Models
 			XmlElement chunk = xmlDocument.CreateElement(chunkType);
 			xmlDocument.DocumentElement.AppendChild(chunk);
 
-			if (chunkType == "SRFS")
+			if (chunkType == "PNTS")
+			{
+				if (Program.writeFloatingPointToText)
+				{
+					Debug.WriteLine(chunkType + ", length " + chunkLength);
+					int vertexCount = chunkLength / 12;
+					for (int i = 0; i < vertexCount; i++)
+					{
+						XmlElement vertex = xmlDocument.CreateElement("Vertex");
+						vertex.InnerText = binaryReader.ReadSingle() + "," + binaryReader.ReadSingle() + "," + binaryReader.ReadSingle();
+						chunk.AppendChild(vertex);
+					}
+				}
+				else
+				{
+					Debug.WriteLine(chunkType + ", length " + chunkLength);
+					byte[] byteArray = binaryReader.ReadBytes(chunkLength);
+					string hex = BitConverter.ToString(byteArray).Replace("-", " ");
+					chunk.SetAttribute("HexData", hex);
+				}
+			}
+
+			else if (chunkType == "SRFS")
 			{
 				Debug.WriteLine(chunkType + ", length " + chunkLength);
 
@@ -93,7 +115,6 @@ namespace LRR_Models
 					for (int i = 0; i < vertCount; i++)
 					{
 						indices[i] = binaryReader.ReadUInt16();
-						//polygon.SetAttribute("Index_" + i, binaryReader.ReadUInt16().ToString());
 					}
 					polygon.SetAttribute("Indices", string.Join(",", indices));
 					Int16 surface = binaryReader.ReadInt16();
@@ -176,6 +197,38 @@ namespace LRR_Models
 					Debug.WriteLine("	  COLR has a weird fourth value: " + shouldBeZero);
 				}
 				chunk.InnerText =  r + "," + g + "," + b;
+			}
+
+			else if (chunkType == "TIMG")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+
+				List<char> chars = new List<char>();
+				bool hasFoundEnd = false;
+				while (!hasFoundEnd)
+				{
+					char currentChar = binaryReader.ReadChar();
+					if (currentChar == '\0')
+					{
+						hasFoundEnd = true;
+					}
+					else
+					{
+						chars.Add(currentChar);
+					}
+				}
+
+				string texturePath = new string(chars.ToArray());
+
+				// Padding
+				if (texturePath.Length % 2 == 0)
+				{
+					binaryReader.ReadByte();
+				}
+
+				chunk.InnerText = texturePath;
+
+				Debug.WriteLine("	  TIMG path: " + texturePath);
 			}
 
 			else

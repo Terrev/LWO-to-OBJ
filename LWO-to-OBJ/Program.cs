@@ -20,5 +20,6 @@ namespace LRR_Models
         }
 
         public static bool flipOnX = false;
+        public static bool writeFloatingPointToText = false;
     }
 }
