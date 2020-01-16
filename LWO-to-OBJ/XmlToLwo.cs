@@ -22,129 +22,7 @@ namespace LRR_Models
 
 			foreach (XmlNode chunk in xmlDocument.DocumentElement.ChildNodes)
 			{
-				binaryWriter.Write(chunk.Name.ToCharArray());
-
-				// Temp length
-				binaryWriter.Write("temp".ToCharArray());
-				long rememberMe = fileStream.Position;
-
-				// READ THE CHUNKS
-				if (chunk.Name == "PNTS")
-				{
-					if (chunk.Attributes["HexData"] != null)
-					{
-						binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
-					}
-					else
-					{
-						foreach (XmlNode vertex in chunk.ChildNodes)
-						{
-							string[] splitStrings = vertex.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-							foreach (string asdsfdsf in splitStrings)
-							{
-								binaryWriter.Write((float)float.Parse(asdsfdsf));
-							}
-						}
-					}
-				}
-
-				else if (chunk.Name == "SRFS")
-				{
-					foreach (XmlNode surfaceName in chunk.ChildNodes)
-					{
-						binaryWriter.Write(surfaceName.InnerText.ToCharArray());
-						binaryWriter.Write('\0');
-						// padding
-						if (surfaceName.InnerText.Length % 2 == 0)
-						{
-							binaryWriter.Write('\0');
-						}
-					}
-				}
-
-				else if (chunk.Name == "POLS")
-				{
-					foreach (XmlNode polygon in chunk.ChildNodes)
-					{
-						string[] splitStrings = polygon.Attributes["Indices"].Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-						binaryWriter.Write((UInt16)splitStrings.Length);
-						foreach (string help in splitStrings)
-						{
-							binaryWriter.Write((UInt16)UInt16.Parse(help));
-						}
-						binaryWriter.Write(UInt16.Parse(polygon.Attributes["Surface"].Value));
-					}
-				}
-
-				else if (chunk.Name == "SURF")
-				{
-					binaryWriter.Write(chunk.Attributes["SurfaceName"].Value.ToCharArray());
-					binaryWriter.Write('\0');
-					// padding
-					if (chunk.Attributes["SurfaceName"].Value.Length % 2 == 0)
-					{
-						binaryWriter.Write('\0');
-					}
-
-					// SURF SUB-CHUNKS
-					// HOOBOY
-					foreach (XmlNode subChunk in chunk.ChildNodes)
-					{
-						binaryWriter.Write(subChunk.Name.ToCharArray());
-
-						// Temp length
-						binaryWriter.Write("te".ToCharArray());
-						long rememberMeAgain = fileStream.Position;
-
-						if (subChunk.Name == "COLR" || subChunk.Name == "TCLR")
-						{
-							string[] splitStrings = subChunk.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-							foreach (string asdfsdhj in splitStrings)
-							{
-								binaryWriter.Write(byte.Parse(asdfsdhj));
-							}
-							binaryWriter.Write('\0');
-						}
-
-						else if (subChunk.Name == "LUMI" || subChunk.Name == "DIFF" || subChunk.Name == "SPEC" || subChunk.Name == "GLOS" || subChunk.Name == "REFL" || subChunk.Name == "TRAN" || subChunk.Name == "TVAL")
-						{
-							binaryWriter.Write(UInt16.Parse(subChunk.InnerText));
-						}
-
-						else if (subChunk.Name == "CTEX" || subChunk.Name == "LTEX" || subChunk.Name == "DTEX" || subChunk.Name == "STEX" || subChunk.Name == "RTEX" || subChunk.Name == "TTEX" || subChunk.Name == "BTEX" || subChunk.Name == "TIMG" || subChunk.Name == "RIMG")
-						{
-							binaryWriter.Write(subChunk.InnerText.ToCharArray());
-							binaryWriter.Write('\0');
-							// padding
-							if (subChunk.InnerText.Length % 2 == 0)
-							{
-								binaryWriter.Write('\0');
-							}
-						}
-
-						else
-						{
-							binaryWriter.Write(StringToByteArray(subChunk.Attributes["HexData"].Value));
-						}
-
-						// Sub-chunk length
-						fileStream.Seek(rememberMeAgain - 2, SeekOrigin.Begin);
-						long lengthAsdf = fileStream.Length - rememberMeAgain;
-						binaryWriter.Write((UInt16)lengthAsdf);
-						fileStream.Seek(0, SeekOrigin.End);
-					}
-				}
-
-				else
-				{
-					binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
-				}
-
-				// Chunk length
-				fileStream.Seek(rememberMe - 4, SeekOrigin.Begin);
-				long length = fileStream.Length - rememberMe;
-				binaryWriter.Write((UInt32)length);
-				fileStream.Seek(0, SeekOrigin.End);
+				ReadChunk(chunk, fileStream, binaryWriter);
 			}
 
 			// Final length
@@ -153,6 +31,135 @@ namespace LRR_Models
 
 			binaryWriter.Close();
 			fileStream.Close();
+		}
+
+		void ReadChunk(XmlNode chunk, FileStream fileStream, BinaryWriter binaryWriter)
+		{
+			binaryWriter.Write(chunk.Name.ToCharArray());
+
+			// Temp length
+			binaryWriter.Write("temp".ToCharArray());
+			long rememberMe = fileStream.Position;
+
+			// READ THE CHUNKS
+			if (chunk.Name == "PNTS")
+			{
+				if (chunk.Attributes["HexData"] != null)
+				{
+					binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
+				}
+				else
+				{
+					foreach (XmlNode vertex in chunk.ChildNodes)
+					{
+						string[] splitStrings = vertex.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+						foreach (string asdsfdsf in splitStrings)
+						{
+							binaryWriter.Write((float)float.Parse(asdsfdsf));
+						}
+					}
+				}
+			}
+
+			else if (chunk.Name == "SRFS")
+			{
+				foreach (XmlNode surfaceName in chunk.ChildNodes)
+				{
+					binaryWriter.Write(surfaceName.InnerText.ToCharArray());
+					binaryWriter.Write('\0');
+					// padding
+					if (surfaceName.InnerText.Length % 2 == 0)
+					{
+						binaryWriter.Write('\0');
+					}
+				}
+			}
+
+			else if (chunk.Name == "POLS")
+			{
+				foreach (XmlNode polygon in chunk.ChildNodes)
+				{
+					string[] splitStrings = polygon.Attributes["Indices"].Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+					binaryWriter.Write((UInt16)splitStrings.Length);
+					foreach (string help in splitStrings)
+					{
+						binaryWriter.Write((UInt16)UInt16.Parse(help));
+					}
+					binaryWriter.Write(UInt16.Parse(polygon.Attributes["Surface"].Value));
+				}
+			}
+
+			else if (chunk.Name == "SURF")
+			{
+				binaryWriter.Write(chunk.Attributes["SurfaceName"].Value.ToCharArray());
+				binaryWriter.Write('\0');
+				// padding
+				if (chunk.Attributes["SurfaceName"].Value.Length % 2 == 0)
+				{
+					binaryWriter.Write('\0');
+				}
+
+				// sub-chunk time
+				foreach (XmlNode subChunk in chunk.ChildNodes)
+				{
+					ReadSurfChunk(subChunk, fileStream, binaryWriter);
+				}
+			}
+
+			else
+			{
+				binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
+			}
+
+			// Chunk length
+			fileStream.Seek(rememberMe - 4, SeekOrigin.Begin);
+			binaryWriter.Write((UInt32)(fileStream.Length - rememberMe));
+			fileStream.Seek(0, SeekOrigin.End);
+		}
+
+		void ReadSurfChunk(XmlNode chunk, FileStream fileStream, BinaryWriter binaryWriter)
+		{
+			binaryWriter.Write(chunk.Name.ToCharArray());
+
+			// Temp length
+			binaryWriter.Write("te".ToCharArray());
+			long rememberMeAgain = fileStream.Position;
+
+			if (chunk.Name == "COLR" || chunk.Name == "TCLR")
+			{
+				string[] splitStrings = chunk.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				foreach (string asdfsdhj in splitStrings)
+				{
+					binaryWriter.Write(byte.Parse(asdfsdhj));
+				}
+				binaryWriter.Write('\0');
+			}
+
+			else if (chunk.Name == "LUMI" || chunk.Name == "DIFF" || chunk.Name == "SPEC" || chunk.Name == "GLOS" || chunk.Name == "REFL" || chunk.Name == "TRAN" || chunk.Name == "TVAL")
+			{
+				binaryWriter.Write(UInt16.Parse(chunk.InnerText));
+			}
+
+			else if (chunk.Name == "CTEX" || chunk.Name == "LTEX" || chunk.Name == "DTEX" || chunk.Name == "STEX" || chunk.Name == "RTEX" || chunk.Name == "TTEX" || chunk.Name == "BTEX" || chunk.Name == "TIMG" || chunk.Name == "RIMG")
+			{
+				binaryWriter.Write(chunk.InnerText.ToCharArray());
+				binaryWriter.Write('\0');
+				// padding
+				if (chunk.InnerText.Length % 2 == 0)
+				{
+					binaryWriter.Write('\0');
+				}
+			}
+
+			else
+			{
+				binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
+			}
+
+			// Sub-chunk length
+			fileStream.Seek(rememberMeAgain - 2, SeekOrigin.Begin);
+			binaryWriter.Write((UInt16)(fileStream.Length - rememberMeAgain));
+			fileStream.Seek(0, SeekOrigin.End);
 		}
 
 		public static byte[] StringToByteArray(String hex)

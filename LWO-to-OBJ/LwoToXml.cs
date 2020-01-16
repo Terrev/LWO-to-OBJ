@@ -32,13 +32,7 @@ namespace LRR_Models
 			// Load the rest of the file
 			while (fileStream.Position < fileStream.Length)
 			{
-				// Chunk type
-				string chunkType = new string(binaryReader.ReadChars(4));
-
-				// Chunk length
-				int chunkLength = (int)binaryReader.ReadUInt32();
-
-				ReadChunk(fileStream, binaryReader, chunkType, chunkLength, xmlDocument);
+				ReadChunk(fileStream, binaryReader, xmlDocument);
 			}
 
 			binaryReader.Close();
@@ -61,8 +55,12 @@ namespace LRR_Models
 			Debug.WriteLine("==================================================================================================\n\n");
 		}
 
-		void ReadChunk(FileStream fileStream, BinaryReader binaryReader, string chunkType, int chunkLength, XmlDocument xmlDocument)
+		void ReadChunk(FileStream fileStream, BinaryReader binaryReader, XmlDocument xmlDocument)
 		{
+			string chunkType = new string(binaryReader.ReadChars(4));
+
+			int chunkLength = (int)binaryReader.ReadUInt32();
+
 			XmlElement chunk = xmlDocument.CreateElement(chunkType);
 			xmlDocument.DocumentElement.AppendChild(chunk);
 
@@ -155,13 +153,7 @@ namespace LRR_Models
 				// now check the sub-chunks
 				while (fileStream.Position < startPoint + chunkLength)
 				{
-					// Chunk type
-					string surfChunkType = new string(binaryReader.ReadChars(4));
-
-					// Chunk length
-					int surfChunkLength = (int)binaryReader.ReadUInt16();
-
-					ReadSurfChunk(fileStream, binaryReader, surfChunkType, surfChunkLength, xmlDocument, chunk);
+					ReadSurfChunk(fileStream, binaryReader, xmlDocument, chunk);
 				}
 			}
 
@@ -174,8 +166,12 @@ namespace LRR_Models
 			}
 		}
 
-		void ReadSurfChunk(FileStream fileStream, BinaryReader binaryReader, string chunkType, int chunkLength, XmlDocument xmlDocument, XmlElement parentChunk)
+		void ReadSurfChunk(FileStream fileStream, BinaryReader binaryReader, XmlDocument xmlDocument, XmlElement parentChunk)
 		{
+			string chunkType = new string(binaryReader.ReadChars(4));
+
+			int chunkLength = (int)binaryReader.ReadUInt16();
+
 			XmlElement chunk = xmlDocument.CreateElement(chunkType);
 			parentChunk.AppendChild(chunk);
 

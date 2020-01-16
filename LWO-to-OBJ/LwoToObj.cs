@@ -39,13 +39,7 @@ namespace LRR_Models
 			// Load the rest of the file
 			while (fileStream.Position < fileStream.Length)
 			{
-				// Chunk type
-				string chunkType = new string(binaryReader.ReadChars(4));
-
-				// Chunk length
-				int chunkLength = (int)binaryReader.ReadUInt32();
-
-				ReadChunk(fileStream, binaryReader, chunkType, chunkLength);
+				ReadChunk(fileStream, binaryReader);
 			}
 
 			// shrug
@@ -83,8 +77,12 @@ namespace LRR_Models
 			Export(model, exportPath);
 		}
 
-		void ReadChunk(FileStream fileStream, BinaryReader binaryReader, string chunkType, int chunkLength)
+		void ReadChunk(FileStream fileStream, BinaryReader binaryReader)
 		{
+			string chunkType = new string(binaryReader.ReadChars(4));
+
+			int chunkLength = (int)binaryReader.ReadUInt32();
+
 			if (chunkType == "PNTS")
 			{
 				Debug.WriteLine(chunkType + ", length " + chunkLength);
@@ -175,13 +173,7 @@ namespace LRR_Models
 				// now check the sub-chunks
 				while (fileStream.Position < startPoint + chunkLength)
 				{
-					// Chunk type
-					string surfChunkType = new string(binaryReader.ReadChars(4));
-
-					// Chunk length
-					int surfChunkLength = (int)binaryReader.ReadUInt16();
-
-					ReadSurfChunk(fileStream, binaryReader, surfChunkType, surfChunkLength, currentSurface);
+					ReadSurfChunk(fileStream, binaryReader, currentSurface);
 				}
 			}
 			else
@@ -191,8 +183,12 @@ namespace LRR_Models
 			}
 		}
 
-		void ReadSurfChunk(FileStream fileStream, BinaryReader binaryReader, string chunkType, int chunkLength, Surface surface)
+		void ReadSurfChunk(FileStream fileStream, BinaryReader binaryReader, Surface surface)
 		{
+			string chunkType = new string(binaryReader.ReadChars(4));
+
+			int chunkLength = (int)binaryReader.ReadUInt16();
+
 			if (chunkType == "COLR")
 			{
 				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
