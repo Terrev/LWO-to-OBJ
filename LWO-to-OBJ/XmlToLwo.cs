@@ -27,7 +27,7 @@ namespace LRR_Models
 
 			// Final length
 			fileStream.Seek(4, SeekOrigin.Begin);
-			binaryWriter.Write((UInt32)fileStream.Length - 8);
+			binaryWriter.Write((UInt32)(fileStream.Length - 8));
 
 			binaryWriter.Close();
 			fileStream.Close();
@@ -41,22 +41,27 @@ namespace LRR_Models
 			binaryWriter.Write("temp".ToCharArray());
 			long rememberMe = fileStream.Position;
 
-			// READ THE CHUNKS
+			// Hex data check
+			if (chunk.Attributes["HexData"] != null)
+			{
+				binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
+
+				// Chunk length (we're done)
+				fileStream.Seek(rememberMe - 4, SeekOrigin.Begin);
+				binaryWriter.Write((UInt32)(fileStream.Length - rememberMe));
+				fileStream.Seek(0, SeekOrigin.End);
+				return;
+			}
+
+			// NOW THE MAIN CHUNK READIN'
 			if (chunk.Name == "PNTS")
 			{
-				if (chunk.Attributes["HexData"] != null)
+				foreach (XmlNode vertex in chunk.ChildNodes)
 				{
-					binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
-				}
-				else
-				{
-					foreach (XmlNode vertex in chunk.ChildNodes)
+					string[] splitStrings = vertex.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (string vertValue in splitStrings)
 					{
-						string[] splitStrings = vertex.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-						foreach (string asdsfdsf in splitStrings)
-						{
-							binaryWriter.Write((float)float.Parse(asdsfdsf));
-						}
+						binaryWriter.Write((float)float.Parse(vertValue));
 					}
 				}
 			}
@@ -80,10 +85,10 @@ namespace LRR_Models
 				foreach (XmlNode polygon in chunk.ChildNodes)
 				{
 					string[] splitStrings = polygon.Attributes["Indices"].Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-					binaryWriter.Write((UInt16)splitStrings.Length);
-					foreach (string help in splitStrings)
+					binaryWriter.Write((UInt16)splitStrings.Length); // How many verts
+					foreach (string index in splitStrings)
 					{
-						binaryWriter.Write((UInt16)UInt16.Parse(help));
+						binaryWriter.Write((UInt16)UInt16.Parse(index));
 					}
 					binaryWriter.Write(UInt16.Parse(polygon.Attributes["Surface"].Value));
 				}
@@ -106,11 +111,6 @@ namespace LRR_Models
 				}
 			}
 
-			else
-			{
-				binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
-			}
-
 			// Chunk length
 			fileStream.Seek(rememberMe - 4, SeekOrigin.Begin);
 			binaryWriter.Write((UInt32)(fileStream.Length - rememberMe));
@@ -123,14 +123,28 @@ namespace LRR_Models
 
 			// Temp length
 			binaryWriter.Write("te".ToCharArray());
-			long rememberMeAgain = fileStream.Position;
+			long rememberMe = fileStream.Position;
 
+			// Hex data check
+			if (chunk.Attributes["HexData"] != null)
+			{
+				binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
+
+				// Sub-chunk length (we're done)
+				fileStream.Seek(rememberMe - 2, SeekOrigin.Begin);
+				binaryWriter.Write((UInt16)(fileStream.Length - rememberMe));
+				fileStream.Seek(0, SeekOrigin.End);
+				return;
+			}
+
+			// And on we go with the real stuff
+			// Chunks that have the same structure are grouped together
 			if (chunk.Name == "COLR" || chunk.Name == "TCLR")
 			{
 				string[] splitStrings = chunk.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-				foreach (string asdfsdhj in splitStrings)
+				foreach (string colorValue in splitStrings)
 				{
-					binaryWriter.Write(byte.Parse(asdfsdhj));
+					binaryWriter.Write(byte.Parse(colorValue));
 				}
 				binaryWriter.Write('\0');
 			}
@@ -151,14 +165,9 @@ namespace LRR_Models
 				}
 			}
 
-			else
-			{
-				binaryWriter.Write(StringToByteArray(chunk.Attributes["HexData"].Value));
-			}
-
 			// Sub-chunk length
-			fileStream.Seek(rememberMeAgain - 2, SeekOrigin.Begin);
-			binaryWriter.Write((UInt16)(fileStream.Length - rememberMeAgain));
+			fileStream.Seek(rememberMe - 2, SeekOrigin.Begin);
+			binaryWriter.Write((UInt16)(fileStream.Length - rememberMe));
 			fileStream.Seek(0, SeekOrigin.End);
 		}
 
