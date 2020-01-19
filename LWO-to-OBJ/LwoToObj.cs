@@ -533,8 +533,13 @@ namespace LRR_Models
 					Color color = model.surfaces[i].color;
 					mtlString.Append("Kd ").Append((float)color.R / 255).Append(" ").Append((float)color.G / 255).Append(" ").Append((float)color.B / 255).Append("\n");
 				}
+				// Transparency
+				// fsghkdjfhgkwhat
+				// sleep
+				float newTransparency = ((float)-model.surfaces[i].transparency / 256) + 1.0f;
+				mtlString.Append("d ").Append(newTransparency).Append("\n");
 				// Texture
-				else
+				if (!String.IsNullOrEmpty(model.surfaces[i].colorTextureImage))
 				{
 					string textureFileName = Path.GetFileName(model.surfaces[i].colorTextureImage);
 					if (textureFileName.EndsWith(" (sequence)"))

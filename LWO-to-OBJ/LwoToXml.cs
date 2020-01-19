@@ -340,6 +340,13 @@ namespace LRR_Models
 				}
 			}
 
+			else if (chunkType == "TWRP")
+			{
+				UInt16 widthSetting = binaryReader.ReadUInt16();
+				UInt16 heightSetting = binaryReader.ReadUInt16();
+				chunk.InnerText = widthSetting + "," + heightSetting;
+			}
+
 			else
 			{
 				Debug.WriteLine("	" + chunkType + ", length " + chunkLength + ", UNHANDLED SURF SUB-CHUNK TYPE");

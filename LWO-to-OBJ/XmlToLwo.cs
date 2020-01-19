@@ -191,6 +191,15 @@ namespace LRR_Models
 				}
 			}
 
+			else if (chunk.Name == "TWRP")
+			{
+				string[] splitStrings = chunk.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				foreach (string ffhjkghg in splitStrings)
+				{
+					binaryWriter.Write(UInt16.Parse(ffhjkghg));
+				}
+			}
+
 			// Sub-chunk length
 			fileStream.Seek(rememberMe - 2, SeekOrigin.Begin);
 			binaryWriter.Write((UInt16)(fileStream.Length - rememberMe));
