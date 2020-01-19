@@ -53,7 +53,10 @@ namespace LRR_Models
 
 		private void button2_Click(object sender, EventArgs e)
 		{
-			Program.writeFloatingPointToText = checkBox2.Checked;
+			Program.floats1 = checkBox2.Checked;
+			Program.floats2 = checkBox3.Checked;
+			Program.floats3 = checkBox4.Checked;
+			Program.floats4 = checkBox5.Checked;
 
 			LwoToXml lwoToXml = new LwoToXml();
 
@@ -103,6 +106,11 @@ namespace LRR_Models
 					form2.ShowDialog();
 				}
 			}
+		}
+
+		private void Form1_Load(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

@@ -67,7 +67,7 @@ namespace LRR_Models
 			if (chunkType == "PNTS")
 			{
 				Debug.WriteLine(chunkType + ", length " + chunkLength);
-				if (Program.writeFloatingPointToText)
+				if (Program.floats1)
 				{
 					int vertexCount = chunkLength / 12;
 					for (int i = 0; i < vertexCount; i++)
@@ -181,18 +181,79 @@ namespace LRR_Models
 				int r = (int)binaryReader.ReadByte();
 				int g = (int)binaryReader.ReadByte();
 				int b = (int)binaryReader.ReadByte();
-				byte shouldBeZero = binaryReader.ReadByte();
-				if (shouldBeZero != 0)
-				{
-					Debug.WriteLine("	  " + chunkType + " has a weird fourth value: " + shouldBeZero);
-				}
-				chunk.InnerText = r + "," + g + "," + b;
+				byte supposedlyUnused = binaryReader.ReadByte();
+				chunk.SetAttribute("Color", r + "," + g + "," + b);
+				chunk.SetAttribute("SupposedlyUnused", supposedlyUnused.ToString("X2"));
 			}
 
-			else if (chunkType == "LUMI" || chunkType == "DIFF" || chunkType == "SPEC" || chunkType == "GLOS" || chunkType == "REFL" || chunkType == "TRAN" || chunkType == "TVAL")
+			else if (chunkType == "FLAG")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				char[] dumb = Convert.ToString(binaryReader.ReadUInt16(), 2).PadLeft(16, '0').ToCharArray();
+				Array.Reverse(dumb);
+
+				string[] flagNames =
+				{
+					"Luminous",
+					"Outline",
+					"Smoothing",
+					"ColorHighlights",
+					"ColorFilter",
+					"OpaqueEdge",
+					"TransparentEdge",
+					"SharpTerminator",
+					"DoubleSided",
+					"Additive",
+					"Unknown1024",
+					"Unknown2048",
+					"Unknown4096",
+					"Unknown8192",
+					"Unknown16384",
+					"Unknown32768"
+				};
+
+				for (int i = 0; i < 16; i++)
+				{
+					XmlElement flag = xmlDocument.CreateElement(flagNames[i]);
+					chunk.AppendChild(flag);
+					flag.InnerText = dumb[i].ToString();
+				}
+			}
+
+			else if (chunkType == "LUMI" || chunkType == "DIFF" || chunkType == "SPEC" || chunkType == "REFL" || chunkType == "TRAN" || chunkType == "GLOS" || chunkType == "TVAL")
 			{
 				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
 				chunk.InnerText = binaryReader.ReadUInt16().ToString();
+			}
+
+			else if (chunkType == "VLUM" || chunkType == "VDIF" || chunkType == "VSPC" || chunkType == "VRFL" || chunkType == "VTRN" || chunkType == "TAMP" || chunkType == "TAAS" || chunkType == "TOPC")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				if (Program.floats2)
+				{
+					chunk.InnerText = binaryReader.ReadSingle().ToString();
+				}
+				else
+				{
+					byte[] byteArray = binaryReader.ReadBytes(chunkLength);
+					string hex = BitConverter.ToString(byteArray).Replace("-", " ");
+					chunk.SetAttribute("HexData", hex);
+				}
+			}
+
+			else if (chunkType == "RSAN" || chunkType == "SMAN")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				if (Program.floats3)
+				{
+					chunk.InnerText = binaryReader.ReadSingle().ToString();
+				}
+				else
+				{
+					byte[] byteArray = binaryReader.ReadBytes(chunkLength);
+					string hex = BitConverter.ToString(byteArray).Replace("-", " ");
+					chunk.SetAttribute("HexData", hex);
+				}
 			}
 
 			else if (chunkType == "CTEX" || chunkType == "LTEX" || chunkType == "DTEX" || chunkType == "STEX" || chunkType == "RTEX" || chunkType == "TTEX" || chunkType == "BTEX" || chunkType == "TIMG" || chunkType == "RIMG")
@@ -225,6 +286,58 @@ namespace LRR_Models
 				chunk.InnerText = texturePath;
 
 				Debug.WriteLine("	  " + chunkType + " path: " + texturePath);
+			}
+
+			else if (chunkType == "TFLG")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				char[] dumb = Convert.ToString(binaryReader.ReadUInt16(), 2).PadLeft(16, '0').ToCharArray();
+				Array.Reverse(dumb);
+
+				string[] flagNames =
+				{
+					"X",
+					"Y",
+					"Z",
+					"WorldCoords",
+					"NegativeImage",
+					"PixelBlending",
+					"Antialiasing",
+					"Unknown128",
+					"Unknown256",
+					"Unknown512",
+					"Unknown1024",
+					"Unknown2048",
+					"Unknown4096",
+					"Unknown8192",
+					"Unknown16384",
+					"Unknown32768"
+				};
+
+				for (int i = 0; i < 16; i++)
+				{
+					XmlElement flag = xmlDocument.CreateElement(flagNames[i]);
+					chunk.AppendChild(flag);
+					flag.InnerText = dumb[i].ToString();
+				}
+			}
+
+			else if (chunkType == "TSIZ" || chunkType == "TCTR" || chunkType == "TFAL" || chunkType == "TVEL")
+			{
+				Debug.WriteLine("	" + chunkType + ", length " + chunkLength);
+				if (Program.floats4)
+				{
+					float x = binaryReader.ReadSingle();
+					float y = binaryReader.ReadSingle();
+					float z = binaryReader.ReadSingle();
+					chunk.InnerText = x + "," + y + "," + z;
+				}
+				else
+				{
+					byte[] byteArray = binaryReader.ReadBytes(chunkLength);
+					string hex = BitConverter.ToString(byteArray).Replace("-", " ");
+					chunk.SetAttribute("HexData", hex);
+				}
 			}
 
 			else

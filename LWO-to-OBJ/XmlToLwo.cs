@@ -141,17 +141,34 @@ namespace LRR_Models
 			// Chunks that have the same structure are grouped together
 			if (chunk.Name == "COLR" || chunk.Name == "TCLR")
 			{
-				string[] splitStrings = chunk.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				string[] splitStrings = chunk.Attributes["Color"].Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 				foreach (string colorValue in splitStrings)
 				{
 					binaryWriter.Write(byte.Parse(colorValue));
 				}
-				binaryWriter.Write('\0');
+				binaryWriter.Write(StringToByteArray(chunk.Attributes["SupposedlyUnused"].Value));
+			}
+
+			else if (chunk.Name == "FLAG" || chunk.Name == "TFLG")
+			{
+				char[] chars = new char[16];
+				for (int i = 0; i < chunk.ChildNodes.Count; i++)
+				{
+					chars[i] = Convert.ToChar(chunk.ChildNodes[i].InnerText);
+				}
+				Array.Reverse(chars);
+				string lol = new string(chars);
+				binaryWriter.Write(Convert.ToUInt16(lol, 2));
 			}
 
 			else if (chunk.Name == "LUMI" || chunk.Name == "DIFF" || chunk.Name == "SPEC" || chunk.Name == "GLOS" || chunk.Name == "REFL" || chunk.Name == "TRAN" || chunk.Name == "TVAL")
 			{
 				binaryWriter.Write(UInt16.Parse(chunk.InnerText));
+			}
+
+			else if (chunk.Name == "VLUM" || chunk.Name == "VDIF" || chunk.Name == "VSPC" || chunk.Name == "VRFL" || chunk.Name == "VTRN" || chunk.Name == "TAMP" || chunk.Name == "TAAS" || chunk.Name == "TOPC" || chunk.Name == "RSAN" || chunk.Name == "SMAN")
+			{
+				binaryWriter.Write(float.Parse(chunk.InnerText));
 			}
 
 			else if (chunk.Name == "CTEX" || chunk.Name == "LTEX" || chunk.Name == "DTEX" || chunk.Name == "STEX" || chunk.Name == "RTEX" || chunk.Name == "TTEX" || chunk.Name == "BTEX" || chunk.Name == "TIMG" || chunk.Name == "RIMG")
@@ -162,6 +179,15 @@ namespace LRR_Models
 				if (chunk.InnerText.Length % 2 == 0)
 				{
 					binaryWriter.Write('\0');
+				}
+			}
+
+			else if (chunk.Name == "TSIZ" || chunk.Name == "TCTR" || chunk.Name == "TFAL" || chunk.Name == "TVEL")
+			{
+				string[] splitStrings = chunk.InnerText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				foreach (string vertValue in splitStrings)
+				{
+					binaryWriter.Write((float)float.Parse(vertValue));
 				}
 			}
 

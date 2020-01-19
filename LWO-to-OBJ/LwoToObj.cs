@@ -196,11 +196,7 @@ namespace LRR_Models
 				int g = (int)binaryReader.ReadByte();
 				int b = (int)binaryReader.ReadByte();
 				surface.color = Color.FromArgb(r, g, b);
-				byte shouldBeZero = binaryReader.ReadByte();
-				if (shouldBeZero != 0)
-				{
-					Debug.WriteLine("	  COLR for " + surface.name + " has a weird fourth value: " + shouldBeZero);
-				}
+				binaryReader.ReadByte(); // usually 00, supposedly unused/unread, but the lightwave 8 exporter seems to do FF instead? whatever
 			}
 
 			else if (chunkType == "FLAG")

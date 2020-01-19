@@ -20,6 +20,9 @@ namespace LRR_Models
 		}
 
 		public static bool flipOnX = false;
-		public static bool writeFloatingPointToText = false;
+		public static bool floats1 = false;
+		public static bool floats2 = false;
+		public static bool floats3 = false;
+		public static bool floats4 = false;
 	}
 }
