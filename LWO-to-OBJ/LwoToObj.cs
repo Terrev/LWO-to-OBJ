@@ -519,7 +519,7 @@ namespace LRR_Models
 				mtlString.Append("# Luminosity:    ").Append(model.surfaces[i].luminosity).Append(" (").Append(((float)model.surfaces[i].luminosity / 256) * 100.0f).Append("%)").Append("\n");
 				mtlString.Append("# Diffuse:       ").Append(model.surfaces[i].diffuse).Append(" (").Append(((float)model.surfaces[i].diffuse / 256) * 100.0f).Append("%)").Append("\n");
 				mtlString.Append("# Specularity:   ").Append(model.surfaces[i].specularity).Append(" (").Append(((float)model.surfaces[i].specularity / 256) * 100.0f).Append("%)").Append("\n");
-				mtlString.Append("# Glossiness     ").Append(model.surfaces[i].glossiness).Append(" (").Append(((float)model.surfaces[i].glossiness / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Glossiness     ").Append(model.surfaces[i].glossiness).Append(" (16 = \"Low\"/minumum, 64 = \"Medium\"/default, 256 = \"High\", 1024 = \"Maximum\")").Append("\n");
 				mtlString.Append("# Reflection:    ").Append(model.surfaces[i].reflection).Append(" (").Append(((float)model.surfaces[i].reflection / 256) * 100.0f).Append("%)").Append("\n");
 				mtlString.Append("# Transparency:  ").Append(model.surfaces[i].transparency).Append(" (").Append(((float)model.surfaces[i].transparency / 256) * 100.0f).Append("%)").Append("\n");
 

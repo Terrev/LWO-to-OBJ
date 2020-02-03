@@ -68,7 +68,7 @@ namespace LRR_Models
 		public int luminosity = 0;
 		public int diffuse = 0;
 		public int specularity = 0;
-		public int glossiness = 0;
+		public int glossiness = 64;
 		public int reflection = 0;
 		public int transparency = 0;
 		public string colorTextureImage = "";
