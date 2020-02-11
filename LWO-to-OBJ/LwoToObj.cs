@@ -510,21 +510,23 @@ namespace LRR_Models
 			mtlString.Append("# ").Append(model.nameWithExtension).Append("\n\n");
 			for (int i = 0; i < model.surfaces.Count; i++)
 			{
-				mtlString.Append("# Surface name:  ").Append(model.surfaces[i].name).Append("\n");
-				mtlString.Append("# Surface flags: ").Append(model.surfaces[i].surfaceFlags).Append("\n");
+				mtlString.Append("# Surface name:   ").Append(model.surfaces[i].name).Append("\n");
+				mtlString.Append("# Surface flags:  ").Append(model.surfaces[i].surfaceFlags).Append("\n");
 
-				mtlString.Append("# Color (RGB):   ").Append(model.surfaces[i].color.R + " " + model.surfaces[i].color.G + " " + model.surfaces[i].color.B).Append("\n");
+				mtlString.Append("# Color (RGB):    ").Append(model.surfaces[i].color.R + " " + model.surfaces[i].color.G + " " + model.surfaces[i].color.B).Append("\n");
 
 				// lol
-				mtlString.Append("# Luminosity:    ").Append(model.surfaces[i].luminosity).Append(" (").Append(((float)model.surfaces[i].luminosity / 256) * 100.0f).Append("%)").Append("\n");
-				mtlString.Append("# Diffuse:       ").Append(model.surfaces[i].diffuse).Append(" (").Append(((float)model.surfaces[i].diffuse / 256) * 100.0f).Append("%)").Append("\n");
-				mtlString.Append("# Specularity:   ").Append(model.surfaces[i].specularity).Append(" (").Append(((float)model.surfaces[i].specularity / 256) * 100.0f).Append("%)").Append("\n");
-				mtlString.Append("# Glossiness     ").Append(model.surfaces[i].glossiness).Append(" (16 = \"Low\"/minumum, 64 = \"Medium\"/default, 256 = \"High\", 1024 = \"Maximum\")").Append("\n");
-				mtlString.Append("# Reflection:    ").Append(model.surfaces[i].reflection).Append(" (").Append(((float)model.surfaces[i].reflection / 256) * 100.0f).Append("%)").Append("\n");
-				mtlString.Append("# Transparency:  ").Append(model.surfaces[i].transparency).Append(" (").Append(((float)model.surfaces[i].transparency / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Luminosity:     ").Append(model.surfaces[i].luminosity).Append(" (").Append(((float)model.surfaces[i].luminosity / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Diffuse:        ").Append(model.surfaces[i].diffuse).Append(" (").Append(((float)model.surfaces[i].diffuse / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Specularity:    ").Append(model.surfaces[i].specularity).Append(" (").Append(((float)model.surfaces[i].specularity / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Glossiness      ").Append(model.surfaces[i].glossiness).Append(" (16 = \"Low\"/minumum, 64 = \"Medium\"/default, 256 = \"High\", 1024 = \"Maximum\")").Append("\n");
+				mtlString.Append("# Reflection:     ").Append(model.surfaces[i].reflection).Append(" (").Append(((float)model.surfaces[i].reflection / 256) * 100.0f).Append("%)").Append("\n");
+				mtlString.Append("# Transparency:   ").Append(model.surfaces[i].transparency).Append(" (").Append(((float)model.surfaces[i].transparency / 256) * 100.0f).Append("%)").Append("\n");
 
-				mtlString.Append("# Texture flags: ").Append(model.surfaces[i].colorTextureFlags).Append("\n");
-				mtlString.Append("# Texture path:  ").Append(model.surfaces[i].colorTextureImage).Append("\n");
+				mtlString.Append("# Texture flags:  ").Append(model.surfaces[i].colorTextureFlags).Append("\n");
+				mtlString.Append("# Texture size:   ").Append(model.surfaces[i].colorTextureSize.X + " " + model.surfaces[i].colorTextureSize.Y + " " + model.surfaces[i].colorTextureSize.Z).Append("\n");
+				mtlString.Append("# Texture center: ").Append(model.surfaces[i].colorTextureCenter.X + " " + model.surfaces[i].colorTextureCenter.Y + " " + model.surfaces[i].colorTextureCenter.Z).Append("\n");
+				mtlString.Append("# Texture path:   ").Append(model.surfaces[i].colorTextureImage).Append("\n");
 
 				mtlString.Append("newmtl ").Append(model.surfaces[i].objFriendlyName).Append("\n");
 				// Color
